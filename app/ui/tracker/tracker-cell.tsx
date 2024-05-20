@@ -2,7 +2,7 @@
 
 import { ReactElement } from "react"
 import { useState } from "react"
-import { Habit as habitType } from "../lib/definitions"
+import { Habit as habitType } from "../../lib/definitions"
 
 export function TrackerCell(day: any, habit: habitType): ReactElement {
 

@@ -1,6 +1,6 @@
-import { Habit as habitType } from "../lib/definitions"
+import { Habit as habitType } from "../../lib/definitions"
 import { TrackerCell } from "./tracker-cell"
-import { fetchHabits } from "../lib/data"
+import { fetchHabits } from "../../lib/data"
 
 const getNumOfCols = (viewType: string) => {
     switch (viewType) {
@@ -30,12 +30,12 @@ export default function TableView({viewType}:{viewType: string}) {
             <table className="text-center text-black text-sm antialiased">
                 <thead>
                     <tr>
-                        <th className="border border-gray-300 text-blue-700 font-semibold min-w-48">Habit</th>
+                        <th className="border border-gray-300 text-blue-700 font-semibold min-w-48 cursor-default">Habit</th>
                         {[...Array(numOfCols)].map((_, i) => (
-                            <th className="border border-gray-300 font-semibold bg-gray-200 text-13px w-6" key={i}>{i + 1}</th>
+                            <th className="border border-gray-300 font-semibold bg-gray-200 text-13px w-6 cursor-default" key={i}>{i + 1}</th>
                         ))}
-                        <th className="border border-gray-300 text-blue-700 font-semibold w-16">Goal</th>
-                        <th className="border border-gray-300 text-blue-700 font-semibold w-16">Hit</th>
+                        <th className="border border-gray-300 text-blue-700 font-semibold w-16 cursor-default">Goal</th>
+                        <th className="border border-gray-300 text-blue-700 font-semibold w-16 cursor-default">Hit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,6 +66,7 @@ export function TableRow({
             <td className="border border-gray-300 bg-gray-200 text-13px px-1 text-left truncate">{habit.title}</td>
             {[...Array(columns)].map((_, i) => (
                 <TrackerCell
+                    key={i}
                     day={i}
                     habit={habit}
                 />

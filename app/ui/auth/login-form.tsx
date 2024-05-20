@@ -1,7 +1,7 @@
 export default function LoginForm() {
   return (
-    <div className="px-6 py-12 bg-white rounded-xl shadow-xl border-t-4 border-yellow-500">
-        <h2 className="text-black text-2xl font-semibold text-center">Habit Tracker</h2>
+    <div className="px-6 py-12 bg-white rounded-xl shadow-xl">
+        <h2 className="text-black text-2xl font-medium text-center">Welcome back 🙂</h2>
         <form className="flex flex-col gap-4 mt-20 text-left text-black">
             <div className="relative">
                 <input id="email" type="text" name="email" placeholder="john@doe.com" className="peer h-10 w-full
@@ -35,8 +35,8 @@ export default function LoginForm() {
             </div>
             <button
                 type="submit"
-                className="rounded-md bg-yellow-500 text-white font-semibold p-2 mt-16 cursor-pointer
-                hover:bg-yellow-400
+                className="rounded-md bg-blue-500 text-white font-semibold p-2 mt-16 cursor-pointer
+                hover:bg-blue-400
                 ">
                 Log in
             </button>
