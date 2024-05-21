@@ -20,7 +20,6 @@ async function seedUsers(client) {
         `;
 
         console.log('Created "users" table');
-        console.log(users);
 
         const insertedUsers = await Promise.all(
             users.map(async (user) => {
@@ -47,8 +46,11 @@ async function seedUsers(client) {
 
 async function seedHabits(client) {
     try {
+        await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
         const createTable = await client.sql`
             CREATE TABLE IF NOT EXISTS habits (
+                id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
                 done_dates TEXT[] NOT NULL,
@@ -64,7 +66,8 @@ async function seedHabits(client) {
             habitsSampleData.map(async (habit) => {
                 return client.sql`
                     INSERT INTO habits (title, description, done_dates, goal, notes, user_id)
-                    VALUES (${habit.title}, ${habit.description}, ${habit.doneDates}, ${habit.goal}, ${habit.notes}, ${habit.userId});
+                    VALUES (${habit.title}, ${habit.description}, ${habit.doneDates}, ${habit.goal}, ${habit.notes}, ${habit.userId})
+                    ON CONFLICT (id) DO NOTHING;
                 `;
             }),
         );

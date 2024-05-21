@@ -1,6 +1,11 @@
 import LoginForm from "../ui/auth/login-form";
+import { Metadata } from 'next';
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: 'Login',
+}
+
+export default function LoginPage() {
   return (
     <main className="bg-neutral-50 h-screen">
       <div className="flex h-full">

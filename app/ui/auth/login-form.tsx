@@ -1,8 +1,16 @@
+'use client';
+
+import { useFormState, useFormStatus } from "react-dom";
+import { authenticate } from "@/app/lib/actions";
+
 export default function LoginForm() {
+    const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+
   return (
     <div className="px-6 py-12 bg-white rounded-xl shadow-xl">
-        <h2 className="text-black text-2xl font-medium text-center">Welcome back 🙂</h2>
-        <form className="flex flex-col gap-4 mt-20 text-left text-black">
+        <p className="text-black text-sm font-normal text-center mb-1">Sign in to</p>
+        <h2 className="text-black text-2xl font-medium text-center">Habit Tracker</h2>
+        <form className="flex flex-col gap-4 mt-20 text-left text-black" action={dispatch}>
             <div className="relative">
                 <input id="email" type="text" name="email" placeholder="john@doe.com" className="peer h-10 w-full
                 border-b-2 border-gray-300 text-gray-900
@@ -33,14 +41,31 @@ export default function LoginForm() {
                 ">
                 Password</label>
             </div>
-            <button
-                type="submit"
-                className="rounded-md bg-blue-500 text-white font-semibold p-2 mt-16 cursor-pointer
-                hover:bg-blue-400
-                ">
-                Log in
-            </button>
+            <LoginButton />            
+            <div
+            className="flex h-8 items-end space-x-1"
+            aria-live="polite"
+            aria-atomic="true"
+            >
+                {errorMessage && (
+                    <p className="text-sm text-red-500">{errorMessage}</p>
+                )}
+            </div>
         </form>
     </div>
     );
+}
+
+function LoginButton()  {
+    const { pending } = useFormStatus();
+
+    return (
+        <button
+            type="submit"
+            className="items-center rounded-lg bg-blue-500 mt-8 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
+            aria-disabled={pending}
+        >
+            Sign In
+        </button>
+    )
 }
