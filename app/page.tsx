@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 
-export default function Home() {
+export default function Page() {
   return (
     <main className="bg-neutral-50 h-screen">
       <div className="flex flex-col h-full">

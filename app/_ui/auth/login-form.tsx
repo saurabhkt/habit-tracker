@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { authenticate } from "@/app/lib/actions";
+import { Button } from "../button";
 
 export default function LoginForm() {
     const [errorMessage, dispatch] = useFormState(authenticate, undefined);
@@ -43,9 +44,9 @@ export default function LoginForm() {
             </div>
             <LoginButton />            
             <div
-            className="flex h-8 items-end space-x-1"
-            aria-live="polite"
-            aria-atomic="true"
+                className="flex h-8 items-end space-x-1"
+                aria-live="polite"
+                aria-atomic="true"
             >
                 {errorMessage && (
                     <p className="text-sm text-red-500">{errorMessage}</p>
@@ -60,12 +61,8 @@ function LoginButton()  {
     const { pending } = useFormStatus();
 
     return (
-        <button
-            type="submit"
-            className="items-center rounded-lg bg-blue-500 mt-8 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
-            aria-disabled={pending}
-        >
+        <Button aria-disabled={pending} >
             Sign In
-        </button>
-    )
+        </Button>
+    );
 }

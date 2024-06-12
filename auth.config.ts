@@ -7,12 +7,16 @@ export const authConfig = {
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
-            const isOnApp = nextUrl.pathname.startsWith('/app');
-            if(isOnApp) {
-                if (isLoggedIn) return true;
+            const nextUrlPathname = nextUrl.pathname;
+            if(nextUrlPathname === '/app' || nextUrlPathname === '/app/') {
+                return Response.redirect(new URL('/app/tracker', nextUrl));
+            }
+            else if(nextUrlPathname.startsWith('/app')) {
+                if (isLoggedIn)
+                    return true;
                 return false; // Redirect unauthenticated users to login page
             } else if (isLoggedIn) {
-                return Response.redirect(new URL('/app', nextUrl));
+                return Response.redirect(new URL('/app/tracker', nextUrl));
             }
             return true;
         },

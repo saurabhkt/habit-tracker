@@ -1,7 +1,5 @@
 export default async function Page() {
     return (
-      <div>
-        
-      </div>
+        <h1 className="text-black">Settings Page</h1>
     )
 }
