@@ -2,7 +2,6 @@
 
 import { Habit as habitType } from "../../_lib/definitions"
 import { TrackerCell } from "./tracker-cell"
-import { fetchHabits } from "../../_lib/data"
 import { useState } from "react";
 
 const getNumOfCols = (viewType: string) => {
@@ -27,11 +26,8 @@ function saveHabit() {
     console.log('save habit');
 }
 
-export default function TableView({viewType}:{viewType: string}) {
-
-    const habits = fetchHabits();
+export default function TableView({viewType, habits}:{viewType: string, habits: habitType[]}) {
     const numOfCols = getNumOfCols(viewType);
-
     const [isAddingHabit, setIsAddingHabit] = useState(false);
 
     return (
