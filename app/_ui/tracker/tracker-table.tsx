@@ -1,8 +1,8 @@
 'use client';
 
-import { Habit as habitType } from "../../lib/definitions"
+import { Habit as habitType } from "../../_lib/definitions"
 import { TrackerCell } from "./tracker-cell"
-import { fetchHabits } from "../../lib/data"
+import { fetchHabits } from "../../_lib/data"
 import { useState } from "react";
 
 const getNumOfCols = (viewType: string) => {
