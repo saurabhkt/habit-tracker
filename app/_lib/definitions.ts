@@ -1,10 +1,26 @@
 export type Habit = {
+    "id": string,
     "title": string,
     "description": string,
-    "doneDates": string[],
-    "goal": number,
-    "notes": string,
     "userId": string,
+}
+
+export type HabitPeriod = {
+    "id": string,
+    "habitId": string,
+    "startDate": string,
+    "endDate": string,
+    "goal": number,
+}
+
+export type HabitCombined = {
+    "id": string,
+    "title": string,
+    "description": string,
+    "userId": string,
+    "startDate": string,
+    "endDate": string,
+    "goal": number,
 }
 
 export type User = {

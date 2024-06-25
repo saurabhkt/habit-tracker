@@ -1,8 +1,10 @@
 'use client';
 
-import { Habit as habitType } from "../../_lib/definitions"
+import { Habit as habitType, HabitCombined, HabitPeriod } from "../../_lib/definitions"
 import { TrackerCell } from "./tracker-cell"
 import { useState } from "react";
+import { createHabit } from "@/app/_lib/actions";
+import { getFirstDayOfMonth, getLastDayOfMonth } from "@/app/_lib/utils";
 
 const getNumOfCols = (viewType: string) => {
     switch (viewType) {
@@ -10,11 +12,7 @@ const getNumOfCols = (viewType: string) => {
             return 7;
         case 'month':
             return (
-                new Date(
-                    new Date().getFullYear(),
-                    new Date().getMonth() + 1,
-                    0
-                ).getDate()
+                getLastDayOfMonth(new Date()).getDate()
             
             );
         default:
@@ -22,13 +20,12 @@ const getNumOfCols = (viewType: string) => {
     }
 }
 
-function saveHabit() {
-    console.log('save habit');
-}
-
-export default function TableView({viewType, habits}:{viewType: string, habits: habitType[]}) {
+export default function TableView({viewType, habits}:{viewType: string, habits: HabitCombined[]}) {
     const numOfCols = getNumOfCols(viewType);
     const [isAddingHabit, setIsAddingHabit] = useState(false);
+
+    const [habitTitle, setHabitTitle] = useState('');
+    const [habitGoal, setHabitGoal] = useState(0);
 
     return (
         <div className="w-full">
@@ -70,7 +67,7 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
         habit,
         columns,
     }: {
-        habit: habitType,
+        habit: HabitCombined,
         columns: number,
     })  {
         return (
@@ -84,7 +81,7 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
                     />
                 ))}
                 <td className="border border-gray-300 text-13px text-center">{habit.goal}</td>
-                <td className="border border-gray-300 text-13px text-center">{habit.notes}</td>
+                <td className="border border-gray-300 text-13px text-center"></td>
             </tr>
         )
     }
@@ -139,6 +136,8 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
                     <input
                         type="text"
                         className="w-full text-13px px-1"
+                        value={habitTitle}
+                        onChange={e => { setHabitTitle(e.target.value)}}
                         autoFocus
                     ></input>
                 </td>
@@ -151,7 +150,9 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
                 <td className="border border-gray-300">
                     <input
                         type="number"
-                        className="w-full text-13px px-1"
+                        className="w-full text-13px px-1 text-center"
+                        value={habitGoal}
+                        onChange={e => { setHabitGoal(Number(e.target.value))}}
                     ></input>
                 </td>
                 <td className="border border-gray-300 text-13px text-center">
@@ -159,6 +160,27 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
             </tr>
         )
     }
+
+    function saveHabit() {
+
+        const habit: habitType = {
+            title: habitTitle,
+            description: "",
+            userId: "",
+            id: "",
+        };
+
+        const habitPeriod: HabitPeriod = {
+            id: "",
+            habitId: "",
+            startDate: getFirstDayOfMonth(new Date()).toISOString().slice(0, 10),
+            endDate: getLastDayOfMonth(new Date()).toISOString().slice(0, 10),
+            goal: habitGoal,
+        }
+
+        createHabit(habit, habitPeriod);
+    }
+
 }
 
 

@@ -1,22 +1,29 @@
-import { Habit } from "./definitions"
+import { HabitCombined } from "./definitions"
 import { sql } from "@vercel/postgres";
 import { auth } from "@/auth";
 
-export async function fetchHabits(): Promise<Habit[]> {
+export async function fetchHabits(): Promise<HabitCombined[]> {
     
     const session = await auth();
     const userId = session?.user?.id;
 
     try {
-        const data = await sql`SELECT * FROM habits where user_id = ${userId} `;
+        // const data = await sql`SELECT * FROM habits where user_id = ${userId} `;
+
+        const data = await sql `SELECT habits.id, habits.title, habits.description, habits.user_id, habit_periods.start_date, habit_periods.end_date, habit_periods.goal
+        FROM habits
+        JOIN habit_periods ON habits.id = habit_periods.habit_id
+        WHERE habits.user_id = ${userId};`
         
-        const habits: Habit[] = data.rows.map(row => ({
+        const habits: HabitCombined[] = data.rows.map(row => ({
+            id: row.id,
             title: row.title,
             description: row.description,
-            doneDates: row.done_dates,
-            goal: row.goal,
-            notes: row.notes,
             userId: row.user_id,
+            startDate: row.start_date,
+            endDate: row.end_date,
+            goal: row.goal,
+
         }));
 
         return habits;

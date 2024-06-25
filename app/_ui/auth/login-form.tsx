@@ -24,6 +24,7 @@ export default function LoginForm() {
                 peer-placeholder-shown:text-gray-400
                 peer-placeholder-shown:top-2 peer-focus:-top-3.5
                 peer-focus:text-gray-600 peer-focus:text-sm
+                peer-autofill:-top-3.5 peer-autofill:text-gray-600 peer-autofill:text-sm
                 ">
                 Email</label>
             </div>
@@ -39,6 +40,7 @@ export default function LoginForm() {
                 peer-placeholder-shown:text-gray-400
                 peer-placeholder-shown:top-2 peer-focus:-top-3.5
                 peer-focus:text-gray-600 peer-focus:text-sm
+                peer-autofill:-top-3.5 peer-autofill:text-gray-600 peer-autofill:text-sm
                 ">
                 Password</label>
             </div>
