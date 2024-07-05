@@ -5,7 +5,8 @@ import { TrackerCell } from "./tracker-cell"
 import { useState } from "react";
 import { getLastDayOfMonth } from "@/app/_lib/utils";
 import { NewHabitRow, SaveCancelHabitButtons } from "./tracker-new-habit-row";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import useOutsideClick from "@/app/_lib/outside-click";
 
 const getNumOfCols = (viewType: string) => {
     switch (viewType) {
@@ -24,13 +25,7 @@ const getNumOfCols = (viewType: string) => {
 export default function TableView({viewType, habits}:{viewType: string, habits: HabitCombined[]}) {
     const numOfCols = getNumOfCols(viewType);
     
-    const [selectedRow, setSelectedRow] = useState(-1);
-
-    const [rowState, setRowState] = useState('');
     const [tableState, setTableState] = useState('');
-
-    const [habitTitle, setHabitTitle] = useState('');
-    const [habitGoal, setHabitGoal] = useState(0);
 
     return (
         <div className="w-full">
@@ -49,21 +44,15 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
                     {habits.map((habit, i)=> {
                         return (
                             <TableRow
+                                key={habit.id}
                                 habit={habit}
                                 columns={numOfCols}
                                 index={i}
-                                selectedRow={selectedRow}
-                                setSelectedRow={setSelectedRow}
-                                rowState={rowState}
-                                setRowState={setRowState}
                             />
                         )
                     })}
                     { tableState == 'adding-row' ? (
-                        <>
-                        <NewHabitRow columns={numOfCols} habitTitle={habitTitle} habitGoal={habitGoal} setHabitTitle={setHabitTitle} setHabitGoal={setHabitGoal} />
-                        <SaveCancelHabitButtons habitTitle={habitTitle} habitGoal={habitGoal} setTableState={setTableState} />
-                        </>
+                        <NewHabitRow columns={numOfCols} setTableState={setTableState} />
                         ) : (
                         <AddHabitButton setTableState={setTableState} />
                         )}
@@ -77,49 +66,25 @@ function TableRow({
     habit,
     columns,
     index,
-    selectedRow,
-    setSelectedRow,
-    rowState,
-    setRowState,
 }: {
     habit: HabitCombined,
     columns: number,
     index: number,
-    selectedRow: number,
-    setSelectedRow: (selectedRow: number) => void,
-    rowState: string,
-    setRowState: (rowState: string) => void,
 })  {
 
-    function handleClick(e: React.MouseEvent) {
-
-        if(rowState == 'editing-row' && selectedRow == index) {
-            return;
-        }
-        else {
-            if(e.detail > 1) {
-                setSelectedRow(index);
-                setRowState('editing-row');
-            }
-            else {
-                selectedRow == index ? setSelectedRow(-1) : setSelectedRow(index);
-                setRowState('');
-            }
-        }
-    }
+    const [rowState, setRowState] = useState('');
 
     return (
         <tr
-            className={ selectedRow == index ? "border-2 border-blue-500" : "" }
+            className="group hover:bg-gray-100"
         >
             <td
                 className={
-                    (rowState == 'editing-row' && selectedRow == index ? "bg-white" : "bg-gray-200 hover:bg-gray-100") +
+                    (rowState == 'editing' ? "bg-white" : "bg-gray-200 group-hover:bg-gray-100") +
                     " border border-gray-300 p-1 text-13px text-left truncate cursor-pointer relative"
                 }
-                onClick={handleClick}
             >
-                {rowState == 'editing-row' && selectedRow == index ? (
+                {rowState == 'editing' ? (
                     <input
                         type="text"
                         className="w-full text-13px px-1 outline-none"
@@ -130,6 +95,7 @@ function TableRow({
                 ) : (
                     habit.title
                 )}
+                {rowState != 'editing' ? (<EditDeleteButtons habit={habit} setRowState={setRowState} />) : ''}
             </td>
             {[...Array(columns)].map((_, i) => (
                 <TrackerCell
@@ -157,3 +123,26 @@ function AddHabitButton({setTableState}:{setTableState: (tableState: string) => 
     )
 }
 
+function EditDeleteButtons({
+        habit,
+        setRowState,
+    }:{
+        habit: HabitCombined,
+        setRowState: (rowState: string) => void,
+    }) {
+    return (
+        <span className="absolute right-0 top-0 bg-white hidden group-hover:block group-hover:bg-gray-100">
+            <button
+                className="text-13px p-1"
+                onClick={()=>{setRowState('editing')}}
+            >
+                <PencilIcon className="w-4"/>
+            </button>
+            <button
+                className="text-13px p-1"
+            >
+                <TrashIcon className="w-4"/>
+            </button>
+        </span>
+    )
+}

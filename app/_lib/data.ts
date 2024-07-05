@@ -8,8 +8,6 @@ export async function fetchHabits(): Promise<HabitCombined[]> {
     const userId = session?.user?.id;
 
     try {
-        // const data = await sql`SELECT * FROM habits where user_id = ${userId} `;
-
         const data = await sql `SELECT habits.id, habits.title, habits.description, habits.user_id, habit_periods.start_date, habit_periods.end_date, habit_periods.goal
         FROM habits
         JOIN habit_periods ON habits.id = habit_periods.habit_id
@@ -25,6 +23,9 @@ export async function fetchHabits(): Promise<HabitCombined[]> {
             goal: row.goal,
 
         }));
+
+        // artificial delay to simulate network latency
+        // await new Promise((resolve) => setTimeout(resolve, 6000));
 
         return habits;
     }

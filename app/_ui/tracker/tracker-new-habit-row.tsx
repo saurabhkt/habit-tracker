@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { TrackerCell } from "./tracker-cell"
 import { Habit as habitType, HabitPeriod } from "@/app/_lib/definitions"
 import { getFirstDayOfMonth, getLastDayOfMonth } from "@/app/_lib/utils"
@@ -5,18 +6,17 @@ import { createHabit } from "@/app/_lib/actions"
 
 export function NewHabitRow({
     columns,
-    habitTitle,
-    habitGoal,
-    setHabitTitle,
-    setHabitGoal,
+    setTableState,
 }: {
     columns: number,
-    habitTitle: string,
-    habitGoal: number,
-    setHabitTitle: (title: string) => void,
-    setHabitGoal: (goal: number) => void,
+    setTableState: (tableState: string) => void,
 }) {
+
+    const [habitTitle, setHabitTitle] = useState('');
+    const [habitGoal, setHabitGoal] = useState(0);
+
     return (
+        <>
         <tr>
             <td className="border border-gray-300">
                 <input
@@ -44,6 +44,8 @@ export function NewHabitRow({
             <td className="border border-gray-300 text-13px text-center">
             </td>
         </tr>
+        <SaveCancelHabitButtons habitTitle={habitTitle} habitGoal={habitGoal} setTableState={setTableState} />
+        </>
     )
 }
 
