@@ -3,8 +3,9 @@
 import { Habit as habitType, HabitCombined, HabitPeriod } from "../../_lib/definitions"
 import { TrackerCell } from "./tracker-cell"
 import { useState } from "react";
-import { createHabit } from "@/app/_lib/actions";
-import { getFirstDayOfMonth, getLastDayOfMonth } from "@/app/_lib/utils";
+import { getLastDayOfMonth } from "@/app/_lib/utils";
+import { NewHabitRow, SaveCancelHabitButtons } from "./tracker-new-habit-row";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 const getNumOfCols = (viewType: string) => {
     switch (viewType) {
@@ -22,7 +23,11 @@ const getNumOfCols = (viewType: string) => {
 
 export default function TableView({viewType, habits}:{viewType: string, habits: HabitCombined[]}) {
     const numOfCols = getNumOfCols(viewType);
-    const [isAddingHabit, setIsAddingHabit] = useState(false);
+    
+    const [selectedRow, setSelectedRow] = useState(-1);
+
+    const [rowState, setRowState] = useState('');
+    const [tableState, setTableState] = useState('');
 
     const [habitTitle, setHabitTitle] = useState('');
     const [habitGoal, setHabitGoal] = useState(0);
@@ -32,7 +37,7 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
             <table className="text-center text-black text-sm antialiased">
                 <thead>
                     <tr>
-                        <th className="border border-gray-300 text-blue-700 font-semibold min-w-48 cursor-default">Habit</th>
+                        <th className="border border-gray-300 text-blue-700 font-semibold min-w-48 cursor-default p-1">Habit</th>
                         {[...Array(numOfCols)].map((_, i) => (
                             <th className="border border-gray-300 font-semibold bg-gray-200 text-13px w-6 cursor-default" key={i}>{i + 1}</th>
                         ))}
@@ -46,17 +51,21 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
                             <TableRow
                                 habit={habit}
                                 columns={numOfCols}
-                                key={habit.id}
+                                index={i}
+                                selectedRow={selectedRow}
+                                setSelectedRow={setSelectedRow}
+                                rowState={rowState}
+                                setRowState={setRowState}
                             />
                         )
                     })}
-                    { isAddingHabit? (
+                    { tableState == 'adding-row' ? (
                         <>
                         <NewHabitRow columns={numOfCols} habitTitle={habitTitle} habitGoal={habitGoal} setHabitTitle={setHabitTitle} setHabitGoal={setHabitGoal} />
-                        <SaveCancelHabitButtons habitTitle={habitTitle} habitGoal={habitGoal} setIsAddingHabit={setIsAddingHabit} />
+                        <SaveCancelHabitButtons habitTitle={habitTitle} habitGoal={habitGoal} setTableState={setTableState} />
                         </>
                         ) : (
-                        <AddHabitButton setIsAddingHabit={setIsAddingHabit} />
+                        <AddHabitButton setTableState={setTableState} />
                         )}
                 </tbody>
             </table>
@@ -67,13 +76,61 @@ export default function TableView({viewType, habits}:{viewType: string, habits: 
 function TableRow({
     habit,
     columns,
+    index,
+    selectedRow,
+    setSelectedRow,
+    rowState,
+    setRowState,
 }: {
     habit: HabitCombined,
     columns: number,
+    index: number,
+    selectedRow: number,
+    setSelectedRow: (selectedRow: number) => void,
+    rowState: string,
+    setRowState: (rowState: string) => void,
 })  {
+
+    function handleClick(e: React.MouseEvent) {
+
+        if(rowState == 'editing-row' && selectedRow == index) {
+            return;
+        }
+        else {
+            if(e.detail > 1) {
+                setSelectedRow(index);
+                setRowState('editing-row');
+            }
+            else {
+                selectedRow == index ? setSelectedRow(-1) : setSelectedRow(index);
+                setRowState('');
+            }
+        }
+    }
+
     return (
-        <tr>
-            <td className="border border-gray-300 bg-gray-200 text-13px px-1 text-left truncate">{habit.title}</td>
+        <tr
+            className={ selectedRow == index ? "border-2 border-blue-500" : "" }
+        >
+            <td
+                className={
+                    (rowState == 'editing-row' && selectedRow == index ? "bg-white" : "bg-gray-200 hover:bg-gray-100") +
+                    " border border-gray-300 p-1 text-13px text-left truncate cursor-pointer relative"
+                }
+                onClick={handleClick}
+            >
+                {rowState == 'editing-row' && selectedRow == index ? (
+                    <input
+                        type="text"
+                        className="w-full text-13px px-1 outline-none"
+                        value={habit.title}
+                        // onChange={e => { setHabitTitle(e.target.value)}}
+                        autoFocus
+                    ></input>
+                ) : (
+                    habit.title
+                )}
+            </td>
             {[...Array(columns)].map((_, i) => (
                 <TrackerCell
                     key={habit.id + i}
@@ -87,114 +144,16 @@ function TableRow({
     )
 }
 
-function AddHabitButton({setIsAddingHabit}:{setIsAddingHabit: (isAddingHabit: boolean) => void}) {
+function AddHabitButton({setTableState}:{setTableState: (tableState: string) => void}) {
     return (
         <tr
             className="cursor-pointer"
-            onClick={() => setIsAddingHabit(true)}
+            onClick={() => setTableState('adding-row')}
         >
-            <td className="border border-gray-300 hover:bg-blue-500 hover:text-white text-blue-700 text-13px px-1 py-1 text-center font-bold truncate">
+            <td className="border border-gray-300 hover:bg-blue-500 hover:text-white text-blue-700 text-13px p-1 text-center font-bold truncate">
                 + Add Habit
             </td>
         </tr>
     )
-}
-
-function NewHabitRow({
-    columns,
-    habitTitle,
-    habitGoal,
-    setHabitTitle,
-    setHabitGoal,
-}: {
-    columns: number,
-    habitTitle: string,
-    habitGoal: number,
-    setHabitTitle: (title: string) => void,
-    setHabitGoal: (goal: number) => void,
-}) {
-    return (
-        <tr>
-            <td className="border border-gray-300">
-                <input
-                    type="text"
-                    className="w-full text-13px px-1"
-                    value={habitTitle}
-                    onChange={e => { setHabitTitle(e.target.value)}}
-                    autoFocus
-                ></input>
-            </td>
-            {[...Array(columns)].map((_, i) => (
-                <TrackerCell
-                    key={i}
-                    day={i}
-                />
-            ))}
-            <td className="border border-gray-300">
-                <input
-                    type="number"
-                    className="w-full text-13px px-1 text-center"
-                    value={habitGoal}
-                    onChange={e => { setHabitGoal(Number(e.target.value))}}
-                ></input>
-            </td>
-            <td className="border border-gray-300 text-13px text-center">
-            </td>
-        </tr>
-    )
-}
-
-function SaveCancelHabitButtons({
-        habitTitle,
-        habitGoal,
-        setIsAddingHabit,
-    }:{
-        habitTitle: string,
-        habitGoal: number,
-        setIsAddingHabit: (isAddingHabit: boolean) => void,
-    }) {
-    return (
-        <tr>
-            <td className="p-0 border border-gray-300">
-                <button
-                    className="bg-blue-500 hover:bg-blue-600 cursor-pointer text-white text-13px text-center font-bold py-1 w-1/2"
-                    onClick={() => {
-                        saveHabit(habitTitle, habitGoal);
-                        setIsAddingHabit(false)}
-                    }
-                >
-                Save
-                </button>
-                <button
-                    className="hover:bg-gray-200 cursor-pointer text-13px text-center font-bold py-1 w-1/2"
-                    onClick={() => {
-                        setIsAddingHabit(false)}
-                    }
-                >
-                Cancel
-                </button>
-            </td>
-        </tr>
-    )
-}
-
-function saveHabit(habitTitle: string, habitGoal: number) {
-
-    const habit: habitType = {
-        title: habitTitle,
-        description: "",
-        userId: "",
-        id: "",
-    };
-
-    const habitPeriod: HabitPeriod = {
-        id: "",
-        habitId: "",
-        startDate: getFirstDayOfMonth(new Date()).toISOString().slice(0, 10),
-        endDate: getLastDayOfMonth(new Date()).toISOString().slice(0, 10),
-        goal: habitGoal,
-    }
-
-    createHabit(habit, habitPeriod);
 }
 
